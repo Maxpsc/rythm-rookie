@@ -415,3 +415,29 @@ export function drawBubble(ctx: Ctx, x: number, y: number, w: number, h: number,
   text(ctx, str, x, y + 1, 22, INK)
   ctx.restore()
 }
+
+/** 返回按钮（游戏内左上角） */
+export function drawBackButton(ctx: Ctx, x: number, y: number, r: number): void {
+  ctx.save()
+  ctx.fillStyle = INK
+  ctx.beginPath()
+  ctx.arc(x + 2, y + 3, r, 0, Math.PI * 2)
+  ctx.fill()
+  ctx.fillStyle = CREAM
+  ctx.strokeStyle = INK
+  ctx.lineWidth = 5
+  ctx.beginPath()
+  ctx.arc(x, y, r, 0, Math.PI * 2)
+  ctx.fill()
+  ctx.stroke()
+  ctx.strokeStyle = INK
+  ctx.lineWidth = 5
+  ctx.beginPath()
+  ctx.moveTo(x + r * 0.4, y - r * 0.45)
+  ctx.lineTo(x - r * 0.25, y)
+  ctx.lineTo(x + r * 0.4, y + r * 0.45)
+  ctx.moveTo(x - r * 0.25, y)
+  ctx.lineTo(x + r * 0.5, y)
+  ctx.stroke()
+  ctx.restore()
+}

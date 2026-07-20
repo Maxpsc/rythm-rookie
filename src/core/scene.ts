@@ -6,6 +6,7 @@ export interface Scene {
   render(ctx: CanvasRenderingContext2D): void
   onPress?(): void
   onKey?(key: string): void
+  onTap?(x: number, y: number): void
 }
 
 export class SceneManager {
@@ -41,6 +42,12 @@ export class SceneManager {
 
   onPress(): void {
     this.current?.onPress?.()
+  }
+
+  /** 点击/触摸：场景没实现 onTap 时退化为 onPress */
+  onTap(x: number, y: number): void {
+    if (this.current?.onTap) this.current.onTap(x, y)
+    else this.current?.onPress?.()
   }
 
   onKey(key: string): void {

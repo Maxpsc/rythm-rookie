@@ -20,9 +20,10 @@ setNav({
 
 manager.replace(new TitleScene())
 
-bindInput(stage.canvas, () => ({
+bindInput(stage, () => ({
   onPress: () => manager.onPress(),
   onKey: (key) => manager.onKey(key),
+  onTap: (x, y) => manager.onTap(x, y),
 }))
 
 let last = performance.now()
@@ -32,6 +33,20 @@ function frame(now: number): void {
   manager.update(dt)
   const ctx = stage.begin()
   manager.render(ctx)
+  // 竖屏提示（手机横过来玩）
+  if (window.innerHeight > window.innerWidth) {
+    ctx.save()
+    ctx.fillStyle = 'rgba(27,27,38,0.82)'
+    ctx.fillRect(0, 0, 960, 540)
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.fillStyle = '#fff8e7'
+    ctx.font = '900 40px "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif'
+    ctx.fillText('竖屏太挤啦', 480, 230)
+    ctx.font = '900 26px "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif'
+    ctx.fillText('把手机横过来，菜鸡才有舞台', 480, 290)
+    ctx.restore()
+  }
   requestAnimationFrame(frame)
 }
 requestAnimationFrame(frame)

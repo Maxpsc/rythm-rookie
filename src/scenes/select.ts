@@ -34,6 +34,18 @@ const ENTRIES: Entry[] = [
 
 const RANK_ORDER = ['C', 'B', 'A', 'S']
 
+// 卡片布局（渲染与触摸命中共用）
+const CW = 320
+const CH = 300
+const GAP = 80
+const CARD_Y = 140
+
+function cardRect(i: number): { x: number; y: number; w: number; h: number } {
+  const totalW = ENTRIES.length * CW + (ENTRIES.length - 1) * GAP
+  const x0 = (W - totalW) / 2
+  return { x: x0 + i * (CW + GAP), y: CARD_Y, w: CW, h: CH }
+}
+
 export function bestRank(gameId: string): string | null {
   return localStorage.getItem(`rr-best-${gameId}`)
 }
@@ -65,6 +77,19 @@ export class SelectScene implements Scene {
     nav.startGame(ENTRIES[this.sel].id)
   }
 
+  /** 触摸/点击：点哪张进哪张 */
+  onTap(x: number, y: number): void {
+    for (let i = 0; i < ENTRIES.length; i++) {
+      const r = cardRect(i)
+      if (x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h) {
+        this.sel = i
+        sfx.uiConfirm()
+        nav.startGame(ENTRIES[i].id)
+        return
+      }
+    }
+  }
+
   onKey(key: string): void {
     if (key === 'ArrowLeft' || key === 'KeyA') {
       this.sel = (this.sel + ENTRIES.length - 1) % ENTRIES.length
@@ -91,19 +116,14 @@ export class SelectScene implements Scene {
     flat.popBackground(ctx, '#ffd93c', '#ffcf2e', this.beatPulse, this.t)
     flat.text(ctx, '选择你的刑场', W / 2, 80, 48, flat.CREAM, 'center', true)
 
-    const cw = 320
-    const ch = 300
-    const gap = 80
-    const totalW = ENTRIES.length * cw + (ENTRIES.length - 1) * gap
-    const x0 = (W - totalW) / 2
-
     ENTRIES.forEach((e, i) => {
-      const x = x0 + i * (cw + gap)
-      const y = 140
+      const r = cardRect(i)
+      const x = r.x
+      const y = r.y
       const selected = i === this.sel
       ctx.save()
-      const cx = x + cw / 2
-      const cy = y + ch / 2
+      const cx = x + CW / 2
+      const cy = y + CH / 2
       ctx.translate(cx, cy)
       if (selected) {
         const s = 1.04 + this.beatPulse * 0.02
@@ -113,12 +133,12 @@ export class SelectScene implements Scene {
       ctx.translate(-cx, -cy)
       // 阴影 + 卡体
       ctx.fillStyle = flat.INK
-      flat.roundRect(ctx, x + 6, y + 8, cw, ch, 20)
+      flat.roundRect(ctx, x + 6, y + 8, CW, CH, 20)
       ctx.fill()
       ctx.fillStyle = selected ? flat.CREAM : '#f2e8d5'
       ctx.strokeStyle = flat.INK
       ctx.lineWidth = 6
-      flat.roundRect(ctx, x, y, cw, ch, 20)
+      flat.roundRect(ctx, x, y, CW, CH, 20)
       ctx.fill()
       ctx.stroke()
       // 图标
@@ -133,14 +153,14 @@ export class SelectScene implements Scene {
         ctx.strokeStyle = flat.INK
         ctx.lineWidth = 4
         ctx.beginPath()
-        ctx.arc(x + cw - 34, y + 34, 24, 0, Math.PI * 2)
+        ctx.arc(x + CW - 34, y + 34, 24, 0, Math.PI * 2)
         ctx.fill()
         ctx.stroke()
-        flat.text(ctx, best, x + cw - 34, y + 35, 26, flat.CREAM)
+        flat.text(ctx, best, x + CW - 34, y + 35, 26, flat.CREAM)
       }
       ctx.restore()
     })
 
-    flat.text(ctx, '← → 选择　空格 开始　Esc 回标题', W / 2, H - 50, 20, flat.INK)
+    flat.text(ctx, '← → 选择　空格 / 点卡片 开始　Esc 回标题', W / 2, H - 50, 20, flat.INK)
   }
 }

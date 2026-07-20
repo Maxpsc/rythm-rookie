@@ -75,6 +75,20 @@ export abstract class RhythmGame implements Scene {
     this.judge.press()
   }
 
+  /** 触摸/点击：左上角返回按钮优先，其余算一次判定按键 */
+  onTap(x: number, y: number): void {
+    const dx = x - RhythmGame.BACK_X
+    const dy = y - RhythmGame.BACK_Y
+    if (dx * dx + dy * dy <= 30 * 30) {
+      nav.goSelect()
+      return
+    }
+    this.onPress()
+  }
+
+  protected static readonly BACK_X = 42
+  protected static readonly BACK_Y = 34
+
   onKey(key: string): void {
     if (key === 'Escape') nav.goSelect()
   }
@@ -171,16 +185,18 @@ export abstract class RhythmGame implements Scene {
   }
 
   private renderHUD(ctx: CanvasRenderingContext2D): void {
+    // 返回按钮
+    flat.drawBackButton(ctx, RhythmGame.BACK_X, RhythmGame.BACK_Y, 22)
     // 进度条
     const progress = Math.max(0, Math.min(this.conductor.beat / this.conductor.lengthBeats, 1))
     ctx.save()
-    flat.roundRect(ctx, 30, 26, 180, 14, 7)
+    flat.roundRect(ctx, 78, 26, 160, 14, 7)
     ctx.fillStyle = 'rgba(43,43,58,0.25)'
     ctx.fill()
-    flat.roundRect(ctx, 30, 26, 180 * progress, 14, 7)
+    flat.roundRect(ctx, 78, 26, 160 * progress, 14, 7)
     ctx.fillStyle = flat.INK
     ctx.fill()
-    flat.text(ctx, this.meta.title, 30, 60, 20, flat.INK, 'left')
+    flat.text(ctx, this.meta.title, 78, 60, 20, flat.INK, 'left')
     ctx.restore()
     // 连击
     flat.drawCombo(ctx, this.judge.combo, W - 90, 90, this.beatPulse)

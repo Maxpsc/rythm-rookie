@@ -25,6 +25,14 @@ export class Stage {
     this.oy = (this.canvas.height - H * this.scale) / 2
   }
 
+  /** 客户端坐标 → 逻辑坐标 */
+  toLogical(cx: number, cy: number): { x: number; y: number } {
+    const rect = this.canvas.getBoundingClientRect()
+    const px = ((cx - rect.left) / rect.width) * this.canvas.width
+    const py = ((cy - rect.top) / rect.height) * this.canvas.height
+    return { x: (px - this.ox) / this.scale, y: (py - this.oy) / this.scale }
+  }
+
   /** 每帧开始：清屏并设置逻辑坐标变换 */
   begin(): CanvasRenderingContext2D {
     const { ctx } = this

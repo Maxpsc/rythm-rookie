@@ -45,6 +45,19 @@ export class ResultScene implements Scene {
     else nav.goSelect()
   }
 
+  /** 触摸/点击：直接点按钮 */
+  onTap(x: number, y: number): void {
+    const by = H - 102
+    if (y < by || y > by + 56) return
+    if (x >= W / 2 - 220 && x <= W / 2 - 20) {
+      this.sel = 0
+      this.onPress()
+    } else if (x >= W / 2 + 20 && x <= W / 2 + 220) {
+      this.sel = 1
+      this.onPress()
+    }
+  }
+
   onKey(key: string): void {
     if (key === 'ArrowLeft' || key === 'ArrowRight' || key === 'KeyA' || key === 'KeyD') {
       this.sel = 1 - this.sel
